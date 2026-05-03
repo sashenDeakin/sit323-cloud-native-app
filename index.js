@@ -5,14 +5,24 @@ const app = express();
 
 app.use(express.json());
 
+// Health check route
 app.get("/", (req, res) => {
-  res.send("Cloud Native API is running 🚀");
+  res.send("Cloud Native Node.js API is running 🚀");
 });
 
+// Save task (simple demo API)
 app.post("/task", (req, res) => {
   const task = JSON.stringify(req.body);
-  fs.appendFileSync("/data/tasks.txt", task + "\n");
-  res.send("Task saved");
+
+  // Store locally inside container (NOT /data)
+  fs.appendFileSync("./tasks.txt", task + "\n");
+
+  res.send("Task saved successfully");
 });
 
-app.listen(3000, () => console.log("Server running"));
+// IMPORTANT: GKE expects 8080
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
